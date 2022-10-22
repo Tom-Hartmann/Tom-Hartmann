@@ -1,0 +1,14 @@
+{
+
+    "OWNER_ID":"", //Your DiscordID
+    "OWNER_USERNAME":"",
+    "BOT_TOKEN": "",
+    "tenorAPI":"ZEEELJXAFQBN",
+    "DEFAULT_PREFIX":"&",
+    "mongoPass": "", //mongoDB link
+    "ERROR_LOGS_CHANNEL": "995342200026169365", // CHANNELID
+    "ALEXFLIPNOTE_API_KEY":"",
+    "YT_COOKIE": "" YT COOKIE
+    
+}
+
