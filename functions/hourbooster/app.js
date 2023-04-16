@@ -17,6 +17,7 @@ telebot()
 */
 if (database.length === 0) {
   console.error("[!] No accounts have been added!");
+  return;
 }
 
 // Calculate the length of the longest name in the database and add 24 to it
