@@ -1,4 +1,4 @@
-const { MessageEmbed, ApplicationCommandOptionType } = require("discord.js");
+const { EmbedBuilder } = require("discord.js");
 const manageDB = require("../../functions/hourbooster/database");
 const { STEAM_API } = require("../../config.json");
 
@@ -32,7 +32,7 @@ module.exports = {
       });
     }
 
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
       .setTitle("Your linked Steam accounts")
       .setColor("#0099ff");
 
