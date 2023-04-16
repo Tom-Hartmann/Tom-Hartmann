@@ -19,6 +19,7 @@ const { loadSlashCommands } = require("./handler/loadSlashCommands");
 const { loadPlayerEvents } = require("./handler/loadPlayerEvents");
 const { DiscordTogether } = require("discord-together");
 const { Player } = require("discord-player");
+const manageDB = require("./functions/hourbooster/database");
 const Enmap = require("enmap");
 
 const client = new Client({
@@ -59,16 +60,13 @@ const player = new Player(client, {
 client.player = player;
 client.db = new Enmap({ name: "musicdb" });
 
+const database = manageDB.read();
+
 loadCommands(client);
 loadEvents(client);
 loadPlayerEvents(client);
 loadSlashCommands(client);
 checkValid();
-setTimeout(function () {
-  const steamHour = require("./functions/hourbooster/app.js");
-  steamHour.startBoost();
-}, 8000); // 5000 milliseconds = 5 seconds
-
 // Error Handling
 
 process.on("uncaughtException", (err) => {
@@ -116,3 +114,14 @@ client.login(BOT_TOKEN).then(() => {
     chalk.bgBlueBright.black(` Successfully logged in as: ${client.user.tag}`)
   );
 });
+
+if (database.length === 0) {
+  console.error("[!] No accounts have been added!");
+  return;
+} else {
+  setTimeout(function () {
+    if (database.length === 0) return;
+    const steamHour = require("./functions/hourbooster/app.js");
+    steamHour.startBoost();
+  }, 8000); // 5000 milliseconds = 5 seconds
+}
