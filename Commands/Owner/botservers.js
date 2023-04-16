@@ -15,9 +15,9 @@ module.exports = {
           `<a:_cross:725303285015117844> Developer Only <a:_cross:725303285015117844>`
         );
       let data = [];
-      client.guilds.cache.forEach((x) => {
+      client.guilds.cache.forEach((guild) => {
         message.channel.send(
-          `🔹**${x.name}** | \`${x.memberCount}\` members (ID: ${x.id})\n............................`
+          `🔹**${guild.name}** | \`${guild.memberCount}\` members (ID: ${guild.id})\n............................`
         );
       });
 

@@ -3,17 +3,21 @@ const cron = require("node-cron");
 const { Guild, Ban } = require("../../database/guildData/tempbanRoles");
 const { ActivityType } = require("discord.js");
 const mongoose = require("mongoose");
-const steamidle = require('../../functions/hourbooster/app')
+const steamidle = require("../../functions/hourbooster/app");
 var os = require("os-utils");
 const { mongoPass } = require("../../config.json");
 module.exports = (client) => {
   const guildin = client.guilds.cache.size;
-  const guildmember = client.users.cache.size;
+  let totalMembers = 0;
+
+  client.guilds.cache.forEach((guild) => {
+    totalMembers += guild.memberCount;
+  });
 
   client.user.setPresence({ status: "online" });
   let textList = [
     " About handling command",
-    " in: " + guildin + " Server." + "Serving: " + guildmember + " member",
+    " in: " + guildin + " Server." + "Serving: " + totalMembers + " member",
     `Current Cpu core : ${os.cpuCount()}`,
   ];
   client.user.setPresence({ status: "online" });
