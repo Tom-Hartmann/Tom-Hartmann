@@ -34,21 +34,23 @@ module.exports = {
     let remainingMessages;
 
     do {
-      const batchsize = Math.min(msgnum - messagesDeleted, 100);
+      const batchsize = Math.min(msgnum - (bulkDeleteCount + deleteCount), 100);
       messages = await interaction.channel.messages.fetch({ limit: batchsize });
+
       if (messages.size === 0) {
         break;
       }
-      messagesDeleted += messages.size;
+
       remainingMessages = messages.filter(
         (msg) => msg.createdAt >= twoWeeksAgo
       );
+      messagesDeleted = remainingMessages.size; // Update this line
+
       if (remainingMessages.size > 0) {
         const deletedMessages = await interaction.channel.bulkDelete(
           remainingMessages
         );
         bulkDeleteCount += deletedMessages.size;
-        messagesDeleted -= deletedMessages.size;
       }
       for (const [id, message] of messages) {
         if (message.createdAt < twoWeeksAgo) {
@@ -56,7 +58,7 @@ module.exports = {
           deleteCount++;
         }
       }
-    } while (messagesDeleted < msgnum);
+    } while (bulkDeleteCount + deleteCount < msgnum); // Update this line
 
     const replyMessage = `Done, If you wish you can delete this\n\n${bulkDeleteCount} messages were deleted using bulk delete\n${deleteCount} messages were deleted individually`;
     try {
