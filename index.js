@@ -19,6 +19,7 @@ const { loadSlashCommands } = require("./handler/loadSlashCommands");
 const { loadPlayerEvents } = require("./handler/loadPlayerEvents");
 const { DiscordTogether } = require("discord-together");
 const { Player } = require("discord-player");
+const intervalInMillisecons = 5 * 60 * 1000; // 5 Min
 const manageDB = require("./functions/hourbooster/database");
 const Enmap = require("enmap");
 
