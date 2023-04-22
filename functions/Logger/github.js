@@ -77,6 +77,27 @@ async function checkRateLimit() {
   }
 }
 
+async function checkRepoAccess() {
+  const url = `https://api.github.com/repos/${githubUsername}/${repo}`;
+  const config = {
+    headers: {
+      Authorization: `token ${personalAccessToken}`,
+    },
+  };
+
+  try {
+    const response = await axios.get(url, config);
+    console.log("Repository details:", response.data);
+  } catch (error) {
+    console.error("Error fetching repository details:", error.message);
+    if (error.response) {
+      console.error("Error response data:", error.response.data);
+    }
+  }
+}
+
+checkRepoAccess();
+
 checkRateLimit();
 
 module.exports = { main };
