@@ -8,7 +8,7 @@ module.exports = async(queue, track, client) => {
 
   const embed = new EmbedBuilder()
   .setTitle("Now playing")
-  .setColor(queue.guild.members.me.displayColor || "BLUE")
+  .setColor(queue.guild.members.me.displayColor || "Blue")
   .setDescription(`[${track.title}](${track.url}) ~ [${track.requestedBy.toString()}]\n${queue.createProgressBar()}`)
   .setImage(`${track.thumbnail}`);
 
