@@ -44,7 +44,7 @@ client.utils = Util;
 client.say = Embeds;
 const player = new Player(client, {
   leaveOnEnd: true,
-  leaveOnStop: true,
+  leaveOnStop: false,
   leaveOnEmpty: false,
   leaveOnEmptyCooldown: 60000,
   autoSelfDeaf: true,
