@@ -15,7 +15,7 @@ module.exports = {
       .setTitle(`${config.OWNER_USERNAME}'s Info`)
       .setColor("Random")
       .setDescription(
-        `**Bot Name: **${client.user.username} \n**Owner: **${config.OWNER_USERNAME} \n**Total Categories: **8 \n**Total Commands: **${client.commands.size} Total Slash Commands: ${client.slash.size} \n**Users:** ${client.users.cache.size} \n**Servers:** ${client.guilds.cache.size} \n**Channels:** ${client.channels.cache.size} \n**Uptime:** ${duration}`
+        `**Bot Name: **${client.user.username} \n**Owner: **${config.OWNER_USERNAME} \n**Total Categories: **8 \n**Total Commands: **${client.commands.size} \n**Total Slash Commands:** ${client.slash.size} \n**Users:** ${client.users.cache.size} \n**Servers:** ${client.guilds.cache.size} \n**Channels:** ${client.channels.cache.size} \n**Uptime:** ${duration}`
       )
       .addFields([
         {
