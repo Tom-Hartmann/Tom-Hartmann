@@ -27,7 +27,7 @@ module.exports = {
     "Boost games on Steam\nDO NOT USE THIS COMMAND IN A GUILD(Server)\nALWAYS USE IT IN DMS WITH THIS BOT",
   botPerms: [],
   userPerms: [],
-  ownerOnly: true,
+  ownerOnly: false,
   options: [
     {
       type: ApplicationCommandOptionType.String,
