@@ -23,17 +23,14 @@ module.exports = {
         const duration = moment
           .duration(client.uptime)
           .format(" D [days], H [hrs], m [mins], s [secs]");
-        let bicon = client.user.displayAvatarURL;
         const RynEmb = new Discord.EmbedBuilder()
-          .setAuthor(client.user.username, client.user.displayAvatarURL)
+          .setAuthor({ name: client.user.username })
           .setDescription(`${client.user.username}'s Stats:`)
           .setTimestamp()
-          .setThumbnail(bicon)
           .setColor("Random")
-          .setFooter(
-            `Requested by ${message.author.username}#${message.author.discriminator}`,
-            message.author.displayAvatarURL
-          )
+          .setFooter({
+            text: `Requested by ${message.author.username}`,
+          })
           .addFields([
             {
               name: ":floppy_disk: Memory usage",
