@@ -6,6 +6,18 @@ const manageDB = require("../../functions/hourbooster/database");
 const axios = require("axios");
 const { STEAM_API } = require("../../config.json");
 
+async function isGameValid(appId, apiKey) {
+  try {
+    const response = await axios.get(
+      `https://store.steampowered.com/api/appdetails?appids=${appId}&key=${apiKey}`
+    );
+    return response.data[appId] && response.data[appId].success;
+  } catch (error) {
+    console.error("Error fetching game details:", error);
+    return false;
+  }
+}
+
 migrate();
 const database = manageDB.read();
 
