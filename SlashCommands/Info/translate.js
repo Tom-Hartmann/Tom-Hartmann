@@ -1,5 +1,5 @@
-const discord = require("discord.js");
 const axios = require("axios");
+const { ApplicationCommandOptionType, MessageEmbed } = require("discord.js");
 
 module.exports = {
   name: "translate",
@@ -7,14 +7,14 @@ module.exports = {
   options: [
     {
       name: "target_language",
-      type: "STRING",
+      type: ApplicationCommandOptionType.String,
       description:
         "The language to translate to (e.g., 'EN' for English, 'DE' for German)",
       required: true,
     },
     {
       name: "text",
-      type: "STRING",
+      type: ApplicationCommandOptionType.String,
       description: "The text to translate",
       required: true,
     },
@@ -34,7 +34,7 @@ module.exports = {
       const response = await axios.post(deepLURL, params);
       const translatedText = response.data.translations[0].text;
 
-      const embed = new discord.MessageEmbed()
+      const embed = new MessageEmbed()
         .setTitle("Translation")
         .addField("Original", text, false)
         .addField("Translated", translatedText, false);
