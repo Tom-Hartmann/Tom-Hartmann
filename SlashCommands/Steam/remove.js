@@ -1,6 +1,7 @@
 const { ApplicationCommandOptionType } = require("discord.js");
 const manageDB = require("../../functions/hourbooster/database");
 const migrate = require("../../functions/hourbooster/migrate");
+const { tryCatch } = require("ramda");
 
 migrate();
 const database = manageDB.read();
@@ -20,35 +21,35 @@ module.exports = {
     },
   ],
   run: async (client, interaction, args) => {
-    const username = await interaction.options.getString("username");
-    const discordUserId = await interaction.user.id;
+    try {
+      const username = await interaction.options.getString("username");
+      const discordUserId = await interaction.user.id; 
 
-    interaction.channel.startTyping();
-
-    interaction.reply({
-      content: "Trying to remove the account from the list, please wait...",
-      ephemeral: true,
-    });
-    let index = database.findIndex(
-      (entry) =>
-        entry.name === username && entry.discordUserId === discordUserId
-    );
-    if (index === -1) {
-      return interaction.followUp({
-        content:
-          "Sorry, we couldn't find a record for this username linked to your Discord user.",
+      await interaction.reply({
+        content: "Trying to remove the account from the list, please wait...",
         ephemeral: true,
       });
-    }
-
+      let index = database.findIndex(
+        (entry) =>
+          entry.name === username && entry.discordUserId === discordUserId
+      );
+      if (index === -1) {
+        return interaction.followUp({
+          content:
+            "Sorry, we couldn't find a record for this username linked to your Discord user.",
+          ephemeral: true,
+        });
+      }
+      
     database.splice(index, 1);
     manageDB.write(database);
-
-    interaction.channel.stopTyping();
 
     return interaction.followUp({
       content: `Successfully removed account '${username}' from the list.`,
       ephemeral: true,
     });
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
   },
 };
