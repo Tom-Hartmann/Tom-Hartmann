@@ -1,6 +1,7 @@
 const memberData = require("../../database/guildData/memberupdates");
 const autobanData = require("../../database/guildData/autoban");
 const { EmbedBuilder } = require("discord.js");
+const { ERROR_LOGS_CHANNEL } = require("../config.json");
 
 module.exports = async (member) => {
   let data;
@@ -24,7 +25,7 @@ module.exports = async (member) => {
           );
         member.ban({ reason: `${banData.AddedBy}(${banData.Reason})` });
       } catch (error) {
-        console.log(`There was a error in guildMemberAdd.js Line 17\n${error}`);
+        console.log(`There was a error in guildMemberAdd.js Line 19\n${error}`);
       }
       try {
         if (!member.bannable)
@@ -35,7 +36,7 @@ module.exports = async (member) => {
           member.ban({ reason: `${banData.AddedBy}(${banData.Reason})` });
         }
       } catch (error) {
-        console.log(`There was a error in guildMemberAdd.js Line 24\n${error}`);
+        console.log(`There was a error in guildMemberAdd.js Line 29\n${error}`);
       }
     }
   } else if (data) {
@@ -51,6 +52,9 @@ module.exports = async (member) => {
 
     try {
       member.guild.channels.cache.get(data.ChannelID).send({ embeds: [embed] });
-    } catch (error) {}
+    } catch (error) {
+      console.log(error)
+      member.guild.channels.cache.get(ERROR_LOGS_CHANNEL).send({ embeds: [embed]});
+    }
   }
 };
