@@ -1,4 +1,7 @@
+const fs = require("fs");
+const fetch = require("node-fetch");
 const JoinMsg = require("../../../database/guildData/joinmsg");
+const path = require("path");
 
 module.exports = async (interaction, client) => {
   if (!interaction.isStringSelectMenu()) return;
@@ -30,6 +33,29 @@ module.exports = async (interaction, client) => {
       collector.on("collect", async (collected) => {
         let joinMsg = collected.content;
 
+        // Save the attached image, if there's any
+        if (collected.attachments.first()) {
+          let imageUrl = collected.attachments.first().url;
+
+          let response = await fetch(imageUrl);
+          let buffer = await response.buffer();
+
+          let imgName = `welcome_${interaction.guild.id}.png`; // Change .jpg to the desired format
+
+          // Get the path to the base folder
+          let baseDir = path.resolve(__dirname, "..", "..", "..", "..");
+          let imgFolderPath = path.join(baseDir, "Images");
+
+          // Check if folder exists; if not, create it
+          if (!fs.existsSync(imgFolderPath)) {
+            fs.mkdirSync(imgFolderPath);
+          }
+
+          let imgPath = path.join(imgFolderPath, imgName);
+
+          fs.writeFileSync(imgPath, buffer);
+        }
+
         let newData = new JoinMsg({
           JoinMsg: joinMsg,
           GuildID: interaction.guild.id,
@@ -38,7 +64,7 @@ module.exports = async (interaction, client) => {
         newData.save();
 
         await collector.stop();
-        return msg.edit(`Goodbye Message has been set to:\n${joinMsg}`);
+        return msg.edit(`Welcome message has been set to:\n${joinMsg}`);
       });
 
       collector.on("end", async (collected) => {
@@ -49,7 +75,7 @@ module.exports = async (interaction, client) => {
         GuildID: interaction.guild.id,
       });
 
-      return msg.edit("Welcome Message has been removed!");
+      return msg.edit("Welcome message has been removed!");
     }
   }
 };
