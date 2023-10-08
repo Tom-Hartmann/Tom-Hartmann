@@ -1,4 +1,4 @@
-const voiceStateData = require("../../../database/guildData/voiceupdates");
+const voiceModel = require("../../../database/guildData/voiceupdates");
 
 module.exports = async (interaction, client) => {
   if (!interaction.isStringSelectMenu()) return;
@@ -10,7 +10,7 @@ module.exports = async (interaction, client) => {
 
     let data;
     try {
-      data = await voiceStateData.findOne({
+      data = await voiceModel.findOne({
         GuildID: interaction.guild.id,
       });
     } catch (error) {
@@ -37,8 +37,8 @@ module.exports = async (interaction, client) => {
 
         if (!channel) return msg.edit("Couldn't find that channel!");
 
-        let newData = new voiceStateData({
-          ChannelID: collected.content,
+        let newData = new voiceModel({
+          TemplateChannelID: collected.content,
           GuildID: interaction.guild.id,
         });
 
@@ -67,7 +67,7 @@ module.exports = async (interaction, client) => {
         console.log("Collector Stopped!");
       });
     } else if (data) {
-      await voiceStateData
+      await voiceModel
         .findOneAndRemove({
           GuildID: interaction.guild.id,
         })
