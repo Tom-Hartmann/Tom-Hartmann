@@ -14,19 +14,22 @@ A versatile Discord bot built to enhance server interaction and management.
 ## Installation & Setup
 
 1. **Clone the repository**
-   \```
+
+   ```
    git clone https://github.com/Tom-Hartmann/Tom-Hartmann.git
-   \```
+   ```
 
 2. **Navigate to the directory**
-   \```
+
+   ```
    cd Tom-Hartmann
-   \```
+   ```
 
 3. **Install dependencies**
-   \```
+
+   ```
    npm install
-   \```
+   ```
 
 4. **Configuration**
 
@@ -34,9 +37,13 @@ A versatile Discord bot built to enhance server interaction and management.
    - Fill in the required fields, such as your bot token.
 
 5. **Start the bot**
-   \```
-   node . or node index.js
-   \```
+   ```
+   node .
+   ```
+   or
+   ```
+   node index.js
+   ```
 
 ## Usage
 
