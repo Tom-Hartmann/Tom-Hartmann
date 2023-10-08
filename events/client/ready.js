@@ -2,6 +2,7 @@ const chalk = require("chalk");
 const cron = require("node-cron");
 const { ERROR_LOGS_CHANNEL } = require("../../config.json");
 const { Guild, Ban } = require("../../database/guildData/tempbanRoles");
+const autobanData = require("../../database/guildData/autoban");
 const { ActivityType } = require("discord.js");
 const mongoose = require("mongoose");
 const steamidle = require("../../functions/hourbooster/app");
