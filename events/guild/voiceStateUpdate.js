@@ -1,78 +1,90 @@
 const voiceData = require("../../database/guildData/voiceupdates");
-const { EmbedBuilder } = require("discord.js");
+const { ERROR_LOGS_CHANNEL } = require("../../config.json");
 
 module.exports = async (oldState, newState) => {
   let data;
+
   try {
     data = await voiceData.findOne({
-      GuildID: channel.guild.id,
+      GuildID: newState.guild.id,
     });
-  } catch (error) {}
+  } catch (error) {
+    console.error("Error fetching voice data:", error);
+    return;
+  }
 
   if (!data) return;
 
-  let oldUser = oldState.member;
-  let newUser = newState.member;
-
-  if (
-    (oldUser.voice.channelId !== newUser.voice.channelId &&
-      newUser.voice.channelId !== null) ||
-    undefined
-  ) {
-    let joinEmbed = new EmbedBuilder()
-      .setTitle("Voice State Updates")
-      .setDescription(
-        `${newUser} joined the voice channel <#${newUser.voice.channelId}>`
-      )
-      .setColor("Green")
-      .setTimestamp();
-
+  // User joined the pre-defined channel to create a new private channel
+  if (newState.channelId && newState.channelId === data.ChannelID) {
     try {
-      newState.guild.channels.cache
-        .get(data.ChannelID)
-        .send({ embeds: [joinEmbed] });
-    } catch (error) {}
-  } else if (
-    (oldUser.voice.channelId !== newUser.voice.channelId &&
-      newUser.voice.channelId === null) ||
-    undefined
-  ) {
-    let leaveEmbed = new EmbedBuilder()
-      .setTitle("Voice State Updates")
-      .setDescription(
-        `${newUser} left the voice channel <#${oldUser.voice.channelId}>`
-      )
-      .setColor("Red")
-      .setTimestamp();
+      const newVoiceChannel = await newState.guild.channels.create(
+        `Private-${newState.member.displayName}`,
+        {
+          type: "GUILD_VOICE",
+          parent: data.CategoryID,
+          reason: "Private voice channel creation",
+          permissionOverwrites: [
+            {
+              id: newState.guild.roles.everyone, // For everyone
+              deny: [
+                "MUTE_MEMBERS",
+                "MOVE_MEMBERS",
+                "MANAGE_CHANNELS",
+                "MANAGE_ROLES",
+              ],
+            },
+            {
+              id: newState.member.id, // For the creator of the channel
+              allow: [
+                "MUTE_MEMBERS",
+                "MOVE_MEMBERS",
+                "MANAGE_CHANNELS",
+                "MANAGE_ROLES",
+              ],
+            },
+            {
+              id: newState.client.user.id, // For the bot
+              allow: [
+                "VIEW_CHANNEL",
+                "CONNECT",
+                "SPEAK",
+                "MUTE_MEMBERS",
+                "DEAFEN_MEMBERS",
+                "MOVE_MEMBERS",
+                "USE_VAD",
+                "MANAGE_CHANNELS",
+                "MANAGE_ROLES",
+              ],
+            },
+          ],
+        }
+      );
 
-    try {
-      newState.guild.channels.cache
-        .get(data.ChannelID)
-        .send({ embeds: [leaveEmbed] });
-    } catch (error) {}
-  } else if (oldState.mute !== newState.mute) {
-    let muteEmbed = new EmbedBuilder()
-      .setTitle("Voice State Updates")
-      .setDescription(`${newUser} was ${newState.mute ? "muted" : "unmuted"}`)
-      .setColor("Green")
-      .setTimestamp();
+      await newState.setChannel(newVoiceChannel); // Move the member to the new private channel
+    } catch (error) {
+      const logChannel = guild.channels.cache.get(ERROR_LOGS_CHANNEL);
+      if (logChannel && logChannel.isText()) {
+        logChannel.send("Error creating private voice channel:", error);
+      }
+      console.error("Error creating private voice channel:", error);
+    }
+  }
 
-    newState.guild.channels.cache
-      .get(data.ChannelID)
-      .send({ embeds: [muteEmbed] });
-  } else if (oldState.deaf !== newState.deaf) {
-    let deafEmbed = new EmbedBuilder()
-      .setTitle("Voice State Updates")
-      .setDescription(
-        `${newUser} was ${newState.deaf ? "deafened" : "undeafened"}`
-      )
-      .setColor("Green")
-      .setTimestamp();
-
-    try {
-      newState.guild.channels.cache
-        .get(data.ChannelID)
-        .send({ embeds: [deafEmbed] });
-    } catch (error) {}
+  // Check if a user left a channel and if it's a private channel to delete when empty
+  if (oldState.channelId && !newState.channelId) {
+    const voiceChannel = oldState.channel;
+    if (
+      voiceChannel.name.startsWith("Private-") &&
+      voiceChannel.members.size === 0
+    ) {
+      voiceChannel.delete("Private voice channel empty").catch((error) => {
+        const logChannel = guild.channels.cache.get(ERROR_LOGS_CHANNEL);
+        if (logChannel && logChannel.isText()) {
+          logChannel.send("Error deleting private voice channel:", error);
+        }
+        console.error("Error deleting private voice channel:", error);
+      });
+    }
   }
 };
