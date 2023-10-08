@@ -1,6 +1,6 @@
 const memberData = require("../../database/guildData/memberupdates");
 const autobanData = require("../../database/guildData/autoban");
-const WelcomeModel = require("../../database/guildData/welcome"); 
+const WelcomeModel = require("../../database/guildData/welcome");
 const JoinMsgModel = require("../../database/guildData/joinmsg");
 const { EmbedBuilder } = require("discord.js");
 const { ERROR_LOGS_CHANNEL } = require("../config.json");
@@ -62,10 +62,14 @@ function sendCustomMessage(channel, member, customMessage) {
     .replace(/{server}/g, member.guild.name)
     .replace(/{membercount}/g, member.guild.memberCount.toString());
 
-  const imagePath = path.join(__dirname, "Images", `${member.guild.id}.png`);
+  const imagePath = path.join(
+    __dirname,
+    "../../Images",
+    `welcome_${member.guild.id}.png`
+  );
 
   if (fs.existsSync(imagePath)) {
-    channel.send(replacedMessage, { files: [imagePath] });
+    channel.send({ content: replacedMessage, files: [imagePath] });
   } else {
     channel.send(replacedMessage);
   }
