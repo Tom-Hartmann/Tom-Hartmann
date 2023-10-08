@@ -1,5 +1,6 @@
 const chalk = require("chalk");
 const cron = require("node-cron");
+const { ERROR_LOGS_CHANNEL } = require("../../config.json");
 const { Guild, Ban } = require("../../database/guildData/tempbanRoles");
 const { ActivityType } = require("discord.js");
 const mongoose = require("mongoose");
@@ -77,4 +78,49 @@ module.exports = (client) => {
       }
     }
   });
+  async function checkAutoBans() {
+    const autobans = await autobanData.find();
+    for (const autoban of autobans) {
+      const targetUser = autoban.UserID;
+
+      // Check if the ban is global or specific
+      const guildsToCheck = autoban.Global
+        ? client.guilds.cache.array()
+        : [client.guilds.cache.get(autoban.GuildID)];
+
+      for (const guild of guildsToCheck) {
+        const member = guild.members.cache.get(targetUser);
+
+        // Check if user is present in the guild
+        if (member) {
+          // Check if the bot has permission to ban in the guild
+          const botMember = guild.members.cache.get(client.user.id);
+          if (botMember && botMember.hasPermission("BAN_MEMBERS")) {
+            try {
+              await member.ban({ reason: autoban.Reason });
+              console.log(
+                `Banned ${targetUser} from ${guild.id} due to autoban.`
+              );
+
+              // Send a log message to the error channel
+              const logChannel = guild.channels.cache.get(ERROR_LOGS_CHANNEL);
+              if (logChannel && logChannel.isText()) {
+                logChannel.send(
+                  `Successfully autobanned ${member.user.tag} (${targetUser}) from ${guild.name}(${guild.id}) due to reason: ${autoban.Reason}.`
+                );
+              }
+            } catch (err) {
+              console.log(`Failed to ban ${targetUser} from ${guild.id}.`, err);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Run the check immediately after bot starts
+  checkAutoBans();
+
+  // Schedule the check every X time (e.g., every hour)
+  cron.schedule("*/30 * * * *", checkAutoBans);
 };
