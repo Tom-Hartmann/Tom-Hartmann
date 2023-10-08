@@ -23,7 +23,7 @@ module.exports = async (message, client) => {
     message.content === `<@${client.user.id}>`
   ) {
     return message.channel.send(
-      `My prefix in this server is \`${PREFIX}\`\n\nTo get a list of commands, type \`${PREFIX}help\``
+      `My prefix in this server is \`${PREFIX}\`\n\nTo get a list of commands, type \`${PREFIX}help\`\n\nI also offer slash commands! Just type \`/\` and you'll see a list of available commands.`
     );
   }
 };
