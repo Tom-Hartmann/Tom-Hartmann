@@ -1,13 +1,11 @@
+const { ChannelType, PermissionsBitField } = require("discord.js");
 const voiceData = require("../../database/guildData/voiceupdates");
-const { ERROR_LOGS_CHANNEL } = require("../../config.json");
 
 module.exports = async (oldState, newState) => {
+  // Retrieve data from the database.
   let data;
-
   try {
-    data = await voiceData.findOne({
-      GuildID: newState.guild.id,
-    });
+    data = await voiceData.findOne({ GuildID: newState.guild.id });
   } catch (error) {
     console.error("Error fetching voice data:", error);
     return;
@@ -15,96 +13,105 @@ module.exports = async (oldState, newState) => {
 
   if (!data || !data.TemplateChannelID) return;
 
-  // Fetch or create the category.
+  // Check if there's an existing category.
   let category = newState.guild.channels.cache.find(
-    (c) => c.name == "✨Private Channels✨" && c.type == "GUILD_CATEGORY"
+    (c) =>
+      c.name == "✨Private Channels✨" && c.type == ChannelType.GuildCategory
   );
 
-  if (!category) {
-    category = await newState.guild.channels.create("✨Private Channels✨", {
-      type: "GUILD_CATEGORY",
-      position: newState.guild.channels.cache.size, // Should create it at the bottom.
+  // Create the category if it doesn't exist.
+  if (!category && newState.channelId === data.TemplateChannelID) {
+    category = await newState.guild.channels.create({
+      name: "✨Private Channels✨",
+      type: ChannelType.GuildCategory,
+      position: newState.guild.channels.cache.size,
     });
   }
 
-  // User joined the pre-defined channel to create a new private channel.
-  if (newState.channelId && newState.channelId === data.TemplateChannelID) {
+  // If the member joins the template channel.
+  if (newState.channelId === data.TemplateChannelID) {
     try {
-      const newVoiceChannel = await newState.guild.channels.create(
-        `Private-${newState.member.displayName}`,
-        {
-          type: "GUILD_VOICE",
-          parent: category.id,
-          reason: "Private voice channel creation",
-          permissionOverwrites: [
-            {
-              id: newState.guild.roles.everyone, // For everyone
-              deny: [
-                "MUTE_MEMBERS",
-                "MOVE_MEMBERS",
-                "MANAGE_CHANNELS",
-                "MANAGE_ROLES",
-              ],
-            },
-            {
-              id: newState.member.id, // For the creator of the channel
-              allow: [
-                "MUTE_MEMBERS",
-                "MOVE_MEMBERS",
-                "MANAGE_CHANNELS",
-                "MANAGE_ROLES",
-              ],
-            },
-            {
-              id: newState.client.user.id, // For the bot
-              allow: [
-                "VIEW_CHANNEL",
-                "CONNECT",
-                "SPEAK",
-                "MUTE_MEMBERS",
-                "DEAFEN_MEMBERS",
-                "MOVE_MEMBERS",
-                "USE_VAD",
-                "MANAGE_CHANNELS",
-                "MANAGE_ROLES",
-              ],
-            },
-          ],
-        }
-      );
+      const newVoiceChannel = await newState.guild.channels.create({
+        name: `✨${newState.member.displayName}`,
+        type: ChannelType.GuildVoice,
+        parent: category.id,
+        permissionOverwrites: [
+          {
+            id: newState.guild.roles.everyone,
+            deny: [
+              PermissionsBitField.Flags.MuteMembers,
+              PermissionsBitField.Flags.MoveMembers,
+              PermissionsBitField.Flags.ManageChannels,
+              PermissionsBitField.Flags.ManageRoles,
+            ],
+          },
+          {
+            id: newState.member.id,
+            allow: [
+              PermissionsBitField.Flags.MuteMembers,
+              PermissionsBitField.Flags.MoveMembers,
+              PermissionsBitField.Flags.ManageChannels,
+              PermissionsBitField.Flags.ManageRoles,
+            ],
+          },
+          {
+            id: newState.client.user.id,
+            allow: [
+              PermissionsBitField.Flags.ViewChannel,
+              PermissionsBitField.Flags.Connect,
+              PermissionsBitField.Flags.Speak,
+              PermissionsBitField.Flags.MuteMembers,
+              PermissionsBitField.Flags.DeafenMembers,
+              PermissionsBitField.Flags.MoveMembers,
+              PermissionsBitField.Flags.UseVAD,
+              PermissionsBitField.Flags.ManageChannels,
+              PermissionsBitField.Flags.ManageRoles,
+            ],
+          },
+        ],
+      });
 
-      await newState.setChannel(newVoiceChannel); // Move the member to the new private channel.
+      await newState.setChannel(newVoiceChannel);
     } catch (error) {
-      const logChannel = newState.guild.channels.cache.get(ERROR_LOGS_CHANNEL);
-      if (logChannel && logChannel.isText()) {
-        logChannel.send("Error creating private voice channel:", error);
-      }
       console.error("Error creating private voice channel:", error);
     }
   }
 
-  // Check if a user left a channel and if it's a private channel to delete when empty.
-  if (oldState.channelId && !newState.channelId) {
-    const voiceChannel = oldState.channel;
-    if (
-      voiceChannel.name.startsWith("Private-") &&
-      voiceChannel.members.size === 0
-    ) {
-      voiceChannel.delete("Private voice channel empty").catch((error) => {
-        const logChannel =
-          newState.guild.channels.cache.get(ERROR_LOGS_CHANNEL);
-        if (logChannel && logChannel.isText()) {
-          logChannel.send("Error deleting private voice channel:", error);
-        }
-        console.error("Error deleting private voice channel:", error);
-      });
+  // Cleanup function to delete empty channels and potentially the category.
+  const cleanup = async () => {
+    const category = oldState.guild.channels.cache.find(
+      (c) =>
+        c.name === "✨Private Channels✨" &&
+        c.type === ChannelType.GuildCategory
+    );
 
-      // If category is empty after deleting the voice channel, delete the category.
-      if (category.children.size === 1) {
-        category.delete("No channels in category").catch((error) => {
-          console.error("Error deleting category:", error);
-        });
+    if (!category) return;
+
+    const children = oldState.guild.channels.cache.filter(
+      (channel) => channel.parentId === category.id
+    );
+
+    children.each((channel) => {
+      if (
+        channel.type === ChannelType.GuildVoice &&
+        channel.members.size === 0
+      ) {
+        channel.delete("Private voice channel empty");
       }
-    }
+    });
+
+    // Checking after a short delay to ensure all deletions have been processed.
+    setTimeout(() => {
+      if (
+        oldState.guild.channels.cache.filter((c) => c.parentId === category.id)
+          .size === 0
+      ) {
+        category.delete("Empty private channels category");
+      }
+    }, 1000);
+  };
+  // Cleanup when a user leaves a voice channel.
+  if (!newState.channelId || oldState.channelId !== newState.channelId) {
+    await cleanup();
   }
 };
