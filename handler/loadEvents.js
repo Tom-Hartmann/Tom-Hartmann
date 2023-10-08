@@ -3,7 +3,7 @@ const guildEvent = (event) => require(`../events/guild/${event}`);
 const menuEvents = (event) => require(`../events/interactions/menus/${event}`);
 const otherEvent = (event) => require(`../events/functions/${event}`);
 const Discord = require("discord.js");
-
+const { ERROR_LOGS_CHANNEL } = require("../config.json");
 function loadEvents(client) {
   const cooldowns = new Discord.Collection();
 
@@ -179,8 +179,12 @@ function loadEvents(client) {
     console.error(error);
     // send an error message to a specific channel or user
     const errorMessage = `An error has occurred: ${error}`;
-    const errorChannel = client.channels.cache.get("CHANNEL_ID");
-    errorChannel.send(errorMessage);
+    const errorChannel = client.channels.cache.get(ERROR_LOGS_CHANNEL);
+    try {
+     errorChannel.send(errorMessage); 
+    } catch (error) {
+      console.log(error)
+    }
   });
 }
 
