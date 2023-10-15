@@ -14,13 +14,29 @@ module.exports = async (member) => {
     byeMsgData = await leaveMsgData.findOne({ GuildID: member.guild.id });
   } catch (error) {
     console.error("Error fetching database data:", error);
+    return; 
   }
 
-  let channelToSend = goodbyeData ? goodbyeData.Bye : data.ChannelID;
+  let channelToSend = goodbyeData
+    ? goodbyeData.Bye
+    : data
+    ? data.ChannelID
+    : null;
+
+  if (!channelToSend) {
+    console.error("No channel found to send the goodbye message.");
+    return;
+  }
+
   let customMessage = byeMsgData ? byeMsgData.ByeMsg : null;
 
   try {
     let channel = member.guild.channels.cache.get(channelToSend);
+
+    if (!channel) {
+      console.error(`Channel with ID ${channelToSend} not found.`);
+      return;
+    }
 
     if (customMessage) {
       sendCustomMessage(channel, member, customMessage);
