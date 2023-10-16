@@ -3,7 +3,7 @@ const autobanData = require("../../database/guildData/autoban");
 const WelcomeModel = require("../../database/guildData/welcome");
 const JoinMsgModel = require("../../database/guildData/joinmsg");
 const { EmbedBuilder } = require("discord.js");
-const { ERROR_LOGS_CHANNEL } = require("../config.json");
+const { ERROR_LOGS_CHANNEL } = require("../../config.json");
 const path = require("path");
 const fs = require("fs");
 
