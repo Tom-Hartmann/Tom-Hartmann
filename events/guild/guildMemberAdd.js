@@ -9,6 +9,8 @@ const fs = require("fs");
 
 module.exports = async (member) => {
   let data, banData, welcomeData, joinMsgData;
+  console.log(member);
+  console.log(member.user.avatar);
 
   try {
     data = await memberData.findOne({ GuildID: member.guild.id });
@@ -18,6 +20,15 @@ module.exports = async (member) => {
   } catch (error) {
     console.error("Error fetching database data:", error);
   }
+
+  const embed = new EmbedBuilder()
+    .setTitle("Member Joined")
+    .setDescription(
+      `User: ${member.user.tag} (${member})\nUser ID: ${member.id}\nAcc. Created: ${member.user.createdAt}\nServer Member Count: ${member.guild.memberCount}`
+    )
+    .setColor("Green")
+    .setTimestamp()
+    .setThumbnail(`${member.user.avatarURL}`);
 
   if (banData && banData.Global === true) {
     try {
@@ -44,13 +55,13 @@ module.exports = async (member) => {
       if (customMessage) {
         sendCustomMessage(channel, member, customMessage);
       } else {
-        channel.send({ embeds: [createDefaultEmbed(member)] });
+        channel.send({ embeds: [embed] });
       }
     } catch (error) {
       console.error("Error sending member joined notification:", error);
       member.guild.channels.cache
         .get(ERROR_LOGS_CHANNEL)
-        .send({ embeds: [createDefaultEmbed(member)] });
+        .send({ embeds: [embed] });
     }
   }
 };
@@ -73,15 +84,4 @@ function sendCustomMessage(channel, member, customMessage) {
   } else {
     channel.send(replacedMessage);
   }
-}
-
-function createDefaultEmbed(member) {
-  return new EmbedBuilder()
-    .setTitle("Member Joined")
-    .setDescription(
-      `User: ${member.user.tag} (${member})\nUser ID: ${member.id}\nAcc. Created: ${member.user.createdAt}\nServer Member Count: ${member.guild.memberCount}`
-    )
-    .setColor("Green")
-    .setTimestamp()
-    .setThumbnail(`${member.user.avatarURL}`);
 }
