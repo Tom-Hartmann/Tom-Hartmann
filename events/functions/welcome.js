@@ -1,6 +1,6 @@
 const welcomeData = require("../../database/guildData/welcome");
 const welcomemsg = require("../../database/guildData/joinmsg");
-const { MessageEmbed } = require("discord.js");
+const { EmbedBuilder } = require("discord.js");
 
 module.exports = async (member) => {
   const avatar = member.user.avatarURL;
@@ -28,7 +28,7 @@ module.exports = async (member) => {
         `${member.guild.memberCount}`
       );
 
-      let embed = new MessageEmbed()
+      let embed = new EmbedBuilder()
         .setDescription(joinmessage)
         .setColor("GREEN");
 
@@ -38,12 +38,12 @@ module.exports = async (member) => {
         member.guild.channels.cache.get(channel).send({ embeds: [embed] });
       } catch (error) {}
     } else if (!data2) {
-      let embed2 = new MessageEmbed()
+      let embed2 = new EmbedBuilder()
         .setTitle("Welcome")
         .setDescription(
           `${member}, Welcome to **${member.guild.name}**! We hope you like our Server! Enjoy Your Stay here!`
         )
-        .setFooter(`We are now ${member.guild.memberCount} members`)
+        .setFooter({text:`We are now ${member.guild.memberCount} members`})
         .setColor("Green");
 
       let channel = data.Welcome;
