@@ -53,6 +53,7 @@
     "giphy-api": "^2.0.1",
     "google-play-scraper": "^9.1.1",
     "got": "^11.5.1",
+    "https": "^1.0.0",
     "humanize-duration": "^3.28.0",
     "imdb-api": "^4.2.0",
     "inquirer": "^5.2.0",
