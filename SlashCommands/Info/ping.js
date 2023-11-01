@@ -19,8 +19,7 @@ module.exports = {
 
         let embed = new discord.EmbedBuilder()
           .setTitle("Ping!")
-          .addField("API Latency", `${Math.round(client.ws.ping)}ms`, true)
-          .addField("Message Latency", `${end - start}ms`, true)
+          .setDescription("API Latency", `${Math.round(client.ws.ping)}ms`,`Message Latency, ${end - start}ms`)
           .setColor("Random");
 
        interaction.editReply({ embeds: [embed] }).catch((e) => interaction.followUp(e));
