@@ -24,7 +24,7 @@ async function isGameValid(appId, apiKey) {
 module.exports = {
   name: "boost",
   description:
-    "Boost games on Steam\nDO NOT USE THIS COMMAND IN A GUILD(Server)\nALWAYS USE IT IN DMS WITH THIS BOT",
+    "This adds your steam account to the hourboost.",
   botPerms: [],
   userPerms: [],
   ownerOnly: false,
