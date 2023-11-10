@@ -10,6 +10,6 @@ module.exports = {
     message.channel.send("Shutting down...").then((m) => {
       client.destroy();
     });
-    await message.channel.send("The Bot has been ShutDown");
+    await message.channel.send("The Bot has been Shutdown");
   },
 };
