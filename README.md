@@ -35,6 +35,7 @@ A versatile Discord bot built to enhance server interaction and management.
 
    - Rename `config.example.json` to `config.json`.
    - Fill in the required fields, such as your bot token.
+   - Rename `database.json.example` to `database.json` in folder `config`.
 
 5. **Start the bot**
    ```
