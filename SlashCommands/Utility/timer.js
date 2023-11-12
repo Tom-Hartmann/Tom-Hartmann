@@ -8,11 +8,11 @@ module.exports = {
       name: "duration",
       description: "Duration of the timer in seconds",
       required: true,
-      type: ApplicationCommandOptionType.INTEGER,
+      type: ApplicationCommandOptionType.Integer,
     },
   ],
-  run: async (client, interaction, args) => {
-    const { duration } = args[0];
+  run: async (client, interaction) => {
+    const duration = interaction.options.getInteger("duration");
 
     if (duration <= 0) {
       return interaction.reply(
