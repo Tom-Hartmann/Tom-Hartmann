@@ -22,7 +22,7 @@ module.exports = async (interaction, client) => {
 
     if (!data) {
       await msg.edit(
-        "Please send the **CHANNEL ID** to be set up for Voice State Update Logs. \nTo get an ID: \n1. Go to your Discord settings > Appearance > Scroll down > Turn on Developer Mode. \n2. Right-click on the desired channel > Copy ID."
+        "Please send the **CHANNEL ID** to be set up for private voice channels. \nTo get an ID: \n1. Go to your Discord settings > Appearance > Scroll down > Turn on Developer Mode. \n2. Right-click on the desired channel > Copy ID."
       );
 
       const filter = (m) => m.author.id === interaction.member.id;
