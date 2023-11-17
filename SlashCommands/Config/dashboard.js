@@ -168,8 +168,8 @@ module.exports = {
               value: "server_updates",
             },
             {
-              label: "Voice State Updates",
-              description: "Set the channel for logging voice state updates",
+              label: "Private voice channels",
+              description: "Set the channel to join to create a private channel",
               value: "voice_state_updates",
             },
           ])
